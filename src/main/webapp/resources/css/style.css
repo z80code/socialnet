@@ -1,0 +1,11 @@
+.header_top_space {
+height: 37px;
+}
+.header_top_fixed{
+  background: none repeat scroll 0 0 #F0F0E9;
+  visibility: hidden;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 9999;
+}
