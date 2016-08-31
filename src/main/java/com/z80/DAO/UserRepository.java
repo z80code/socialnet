@@ -38,9 +38,9 @@ public class UserRepository<T, ID> implements CrudRepository, CrudRepositoryAddo
     public static final String SQL_UPDATE =
             "update " + User.TABLE_NAME +
                     " set (" +
-                    User.USER_NAME + ", " + User.USER_PASSWORD + ", " + User.USER_HASHPASS + ", " +
-                    User.USER_HASHSESSION + ", " + User.USER_HASHCOOKIE + ", " + User.USER_HASHID + ", " +
-                    User.USER_ROLE + ", " + User.USER_DATA + ") " +
+                    User.USER_NAME + "=?" + ", " + User.USER_PASSWORD + "=?" + ", " + User.USER_HASHPASS + "=?" + ", " +
+                    User.USER_HASHSESSION + "=?" + ", " + User.USER_HASHCOOKIE + "=?" + ", " + User.USER_HASHID + "=?" + ", " +
+                    User.USER_ROLE + "=?" + ", " + User.USER_DATA + "=?" + ") " +
                     "where " + User.USER_ID + "=?";
 
     public static final String SQL_DELETE =
@@ -86,7 +86,6 @@ public class UserRepository<T, ID> implements CrudRepository, CrudRepositoryAddo
         Connection conn = connectionManager.getConnection();
         List<User> users = new ArrayList<>();
         PreparedStatement statement = conn.prepareStatement(SQL_FIND_ALL);
-        statement.setString(1, "users");
         ResultSet result = statement.executeQuery();
         while (result.next()) {
             users.add(getFromResult(result));

@@ -3,7 +3,7 @@ package com.z80.DAO.Core;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-public interface CrudRepository<T, ID extends Serializable> extends Repository<T, ID> {
+public interface CrudRepository<T, ID extends Serializable> extends Repository<T,ID> {
 
     long count() throws SQLException, ClassNotFoundException;
 

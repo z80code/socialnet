@@ -4,7 +4,8 @@ import com.google.inject.Inject;
 import com.z80.DAO.Core.ConnectionManager;
 import com.z80.DAO.Core.CrudRepository;
 import com.z80.DAO.Core.CrudRepositoryAddon;
-import com.z80.Models.User;
+
+import com.z80.Models.UserData;
 import com.z80.services.Security;
 
 import java.io.Serializable;
@@ -22,31 +23,33 @@ public class UserDataRepository<T, ID> implements CrudRepository, CrudRepository
         this.connectionManager = connectionManager;
     }
 
-    private static final String SQL_FIND_ALL = "select * from " + User.TABLE_NAME;
-    private static final String SQL_FIND_COUNT = "select count(*) as count from " + User.TABLE_NAME;
-    private static final String SQL_FIND_BY_ID = SQL_FIND_ALL + " where " + User.USER_ID + "=? limit 1";
-    private static final String SQL_FIND_BY_NAME = SQL_FIND_ALL + " where " + User.USER_NAME + "=? limit 1";
-    private static final String SQL_FIND_BY_HASHCOOKIE = SQL_FIND_ALL + " where " + User.USER_HASHCOOKIE + "=? limit 1";
+    //USERDATA_ID  	USERDATA_FIRSTNAME  	USERDATA_LASTNAME  	USERDATA_EMAIL  	USERDATA_HOBBY
+    private static final String SQL_FIND_ALL = "select * from " + UserData.TABLE_NAME;
+    private static final String SQL_FIND_COUNT = "select count(*) as count from " + UserData.TABLE_NAME;
+    private static final String SQL_FIND_BY_ID = SQL_FIND_ALL + " where " + UserData.USERDATA_ID + "=? limit 1";
+    private static final String SQL_FIND_BY_HASH = SQL_FIND_ALL + " where " + UserData.USERDATA_HASH + "=? limit 1";
 
-    private static final String SQL_INSERT_USER =
-            "insert into " + User.TABLE_NAME + "(" +
-                    User.USER_NAME + ", " + User.USER_PASSWORD + ", " + User.USER_HASHPASS + ", " +
-                    User.USER_HASHSESSION + ", " + User.USER_HASHCOOKIE + ", " + User.USER_HASHID + ", " +
-                    User.USER_ROLE + ", " + User.USER_DATA + ") " +
-                    "values (?,?,?,?,?,?,?,?)";
+    private static final String SQL_FIND_BY_FIRSTNAME = SQL_FIND_ALL + " where " + UserData.USERDATA_FIRSTNAME + "=?";
+    private static final String SQL_FIND_BY_LASTNAME = SQL_FIND_ALL + " where " + UserData.USERDATA_LASTNAME + "=?";
+    private static final String SQL_FIND_BY_HOBBY = SQL_FIND_ALL + " where " + UserData.USERDATA_HOBBY + "=?";
+
+    private static final String SQL_INSERT_USERDATA =
+            "insert into " + UserData.TABLE_NAME + "(" +
+                    UserData.USERDATA_FIRSTNAME + ", " + UserData.USERDATA_LASTNAME + ", " +
+                    UserData.USERDATA_EMAIL + ", " + UserData.USERDATA_HOBBY + ") " +
+                    "values (?,?,?,?)";
 
     public static final String SQL_UPDATE =
-            "update " + User.TABLE_NAME +
+            "update " + UserData.TABLE_NAME +
                     " set (" +
-                    User.USER_NAME + ", " + User.USER_PASSWORD + ", " + User.USER_HASHPASS + ", " +
-                    User.USER_HASHSESSION + ", " + User.USER_HASHCOOKIE + ", " + User.USER_HASHID + ", " +
-                    User.USER_ROLE + ", " + User.USER_DATA + ") " +
-                    "where " + User.USER_ID + "=?";
+                    UserData.USERDATA_FIRSTNAME + "=?" + ", " + UserData.USERDATA_LASTNAME + "=?" + ", " +
+                    UserData.USERDATA_EMAIL + "=?" + ", " + UserData.USERDATA_HOBBY + "=?" + ") " +
+                    "where " + UserData.USERDATA_ID + "=?";
 
     public static final String SQL_DELETE =
             "delete " +
-                    "from " + User.TABLE_NAME + " " +
-                    "where " + User.USER_ID + "=?";
+                    "from " + UserData.TABLE_NAME + " " +
+                    "where " + UserData.USERDATA_ID + "=?";
 
     @Override
     public long count() throws SQLException, ClassNotFoundException {
@@ -84,14 +87,13 @@ public class UserDataRepository<T, ID> implements CrudRepository, CrudRepository
     @Override
     public Iterable findAll() throws SQLException, ClassNotFoundException {
         Connection conn = connectionManager.getConnection();
-        List<User> users = new ArrayList<>();
+        List<UserData> userDatas = new ArrayList<>();
         PreparedStatement statement = conn.prepareStatement(SQL_FIND_ALL);
-        statement.setString(1, "users");
         ResultSet result = statement.executeQuery();
         while (result.next()) {
-            users.add(getFromResult(result));
+            userDatas.add(getFromResult(result));
         }
-        return users;
+        return userDatas;
     }
 
     @Override
@@ -103,37 +105,33 @@ public class UserDataRepository<T, ID> implements CrudRepository, CrudRepository
         return (result.next()) ? getFromResult(result) : null;
     }
 
-    private void saveOne(User user) throws SQLException {
+    private void saveOne(UserData userData) throws SQLException {
 
-        PreparedStatement statement = conn.prepareStatement(SQL_INSERT_USER);
-        statement.setString(1, user.getName());
-        statement.setString(2, user.getPassword());
-        statement.setString(3, Security.MD5(user.getPassword()));
-        statement.setString(4, Security.MD5(Security.randString()));
-        statement.setString(5, Security.MD5(Security.randString()));
-        statement.setString(6, Security.MD5(Security.randString()));
-        statement.setString(7, String.format("%d", user.getRole()));
-        statement.setString(8, String.format("%d", user.getData()));
+        PreparedStatement statement = conn.prepareStatement(SQL_INSERT_USERDATA);
+        statement.setString(1, userData.getUserdata_firstname());
+        statement.setString(2, userData.getUserdata_lastname());
+        statement.setString(3, userData.getUserdata_email());
+        statement.setString(4, userData.getUserdata_hobby());
         statement.executeUpdate();
     }
 
     @Override
     public Object save(Object entity) throws ClassNotFoundException, SQLException {
         Connection conn = connectionManager.getConnection();
-        User user = (User) entity;
-        saveOne(user);
-        return findByName(user.getName());
+        UserData userData = (UserData) entity;
+        saveOne(userData);
+        return findByHash(userData.getUserdata_hash());
     }
 
     @Override
     public Iterable save(Iterable entities) throws SQLException, ClassNotFoundException {
-        List<User> list = new ArrayList<>();
+        List<UserData> list = new ArrayList<>();
         Connection conn = connectionManager.getConnection();
         for (Object obj : entities) {
-            User user = (User) obj;
-            saveOne(user);
-            user = (User) findByName(user.getName());
-            list.add(user);
+            UserData userData = (UserData) obj;
+            saveOne(userData);
+            userData = (UserData) findByHash(userData.getUserdata_hash());
+            list.add(userData);
         }
         return list;
     }
@@ -141,32 +139,37 @@ public class UserDataRepository<T, ID> implements CrudRepository, CrudRepository
     @Override
     public Object findByHash(Serializable hash) throws SQLException, ClassNotFoundException {
         conn = connectionManager.getConnection();
-        PreparedStatement statement = conn.prepareStatement(SQL_FIND_BY_HASHCOOKIE);
+        PreparedStatement statement = conn.prepareStatement(SQL_FIND_BY_HASH);
         statement.setString(1, (String) hash);
         ResultSet result = statement.executeQuery();
         return (result.next()) ? getFromResult(result) : null;
     }
 
     @Override
-    public Object findByName(Serializable name) throws SQLException, ClassNotFoundException {
+    public Object findByName(Serializable firstName) throws SQLException, ClassNotFoundException {
         conn = connectionManager.getConnection();
-        PreparedStatement statement = conn.prepareStatement(SQL_FIND_BY_NAME);
-        statement.setString(1, (String) name);
+        PreparedStatement statement = conn.prepareStatement(SQL_FIND_BY_FIRSTNAME);
+        statement.setString(1, (String) firstName);
         ResultSet result = statement.executeQuery();
         return (result.next()) ? getFromResult(result) : null;
     }
 
-    private User getFromResult(ResultSet result) throws SQLException {
-        return new User(
-                result.getInt("user_id"),
-                result.getString("user_name"),
-                result.getString("user_password"),
-                result.getString("user_hashpass"),
-                result.getString("user_hashsession"),
-                result.getString("user_hashcookie"),
-                result.getString("user_hashid"),
-                result.getInt("user_role"),
-                result.getInt("user_data")
+    public Object findByLastName(Serializable lastName) throws SQLException, ClassNotFoundException {
+        conn = connectionManager.getConnection();
+        PreparedStatement statement = conn.prepareStatement(SQL_FIND_BY_LASTNAME);
+        statement.setString(1, (String) lastName);
+        ResultSet result = statement.executeQuery();
+        return (result.next()) ? getFromResult(result) : null;
+    }
+
+    private UserData getFromResult(ResultSet result) throws SQLException {
+        return new UserData(
+                result.getInt("userdata_id"),
+                result.getString("userdata_hash"),
+                result.getString("userdata_firstname"),
+                result.getString("userdata_lastname"),
+                result.getString("userdata_email"),
+                result.getString("userdata_hobby")
         );
     }
 }

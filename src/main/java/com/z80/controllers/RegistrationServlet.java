@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.z80.Models.Page;
 import com.z80.Models.PageMode;
 import com.z80.Models.User;
+import com.z80.Models.UserData;
 import com.z80.exceptions.AuthException;
 import com.z80.services.Auth;
 import com.z80.services.UserService;
@@ -37,30 +38,19 @@ public class RegistrationServlet extends HttpServlet {
                 //TODO
                 Auth authService = new Auth(req, resp);
                 user = authService.getUser(req, resp);
-
             } catch (Exception e) {
-                if (e instanceof SQLException) {
-                    error = new Exception("Ошибка соединения с базой.(Error 001)", e);
-                } else if (e instanceof ClassNotFoundException) {
-                    error = new Exception("Ошибка соединения с базой.(Error 002)", e);
-                } else if (e instanceof AuthException) {
-                    error = new Exception("Ошибка соединения с базой.(Error 002)", e);
-                }
+                throwExcep(e);
             }
         }
 
         if (user == null) {
             UserService userService = new UserService();
             try {
-                user = userService.regUser(username, password, email);
+                user = new User(0,username, password);
+                UserData userData = new UserData(0,user.getHashid(), null, null, email, null);
+                user = userService.regUser(user, userData);
             } catch (Exception e) {
-                if (e instanceof SQLException) {
-                    error = new Exception("Ошибка соединения с базой.(Error 001)", e);
-                } else if (e instanceof ClassNotFoundException) {
-                    error = new Exception("Ошибка соединения с базой.(Error 002)", e);
-                } else if (e instanceof AuthException) {
-                    error = new Exception("Ошибка соединения с базой.(Error 002)", e);
-                }
+                throwExcep(e);
             }
         }
         Page page = new Page("Вход | Регистрация", user, PageMode.Login);
@@ -68,4 +58,15 @@ public class RegistrationServlet extends HttpServlet {
         if (user != null) resp.sendRedirect("/");
 
     }
+    private Exception throwExcep(Exception e){
+        if (e instanceof SQLException) {
+            return new Exception("Ошибка соединения с базой.(Error 001)", e);
+        } else if (e instanceof ClassNotFoundException) {
+            return new Exception("Ошибка соединения с базой.(Error 002)", e);
+        } else if (e instanceof AuthException) {
+            return new Exception("Ошибка соединения с базой.(Error 002)", e);
+        }
+        return null;
+    }
+
 }
