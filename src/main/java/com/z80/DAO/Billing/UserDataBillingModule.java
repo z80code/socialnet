@@ -5,10 +5,10 @@ import com.z80.DAO.Core.Repository;
 import com.z80.DAO.UserDataRepository;
 import com.z80.DAO.UserRepository;
 
-public class BillingModule extends AbstractModule {
+public class UserDataBillingModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(Repository.class).to(UserRepository.class);
         bind(Repository.class).to(UserDataRepository.class);
     }
 }
+
