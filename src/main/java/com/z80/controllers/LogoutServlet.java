@@ -15,7 +15,7 @@ public class LogoutServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Auth auth = new Auth();
+        Auth auth = new Auth(req, resp);
         auth.exit(req, resp);
         resp.sendRedirect("/");
     }

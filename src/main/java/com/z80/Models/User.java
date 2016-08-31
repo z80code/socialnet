@@ -1,10 +1,19 @@
 package com.z80.Models;
 
-
 import com.z80.services.Security;
 
 // POJO
 public class User {
+    public static final String TABLE_NAME = "users";
+    public static final String USER_ID = "user_id";
+    public static final String USER_NAME = "user_name";
+    public static final String USER_PASSWORD = "user_password";
+    public static final String USER_HASHPASS = "user_hashpass";
+    public static final String USER_HASHSESSION = "user_hashsession";
+    public static final String USER_HASHCOOKIE = "user_hashcookie";
+    public static final String USER_HASHID = "user_hashid";
+    public static final String USER_ROLE = "user_role";
+    public static final String USER_DATA = "user_data";
 
     private int id;
     private String name;
@@ -23,11 +32,12 @@ public class User {
         this.id = id;
         this.name = name;
         this.password = password;
-        this.hashsession = Security.MD5(id + name + password);
         this.hashpass = Security.MD5(password);
+        this.hashsession = Security.MD5(id + name + password);
+        this.hashcookie = Security.MD5(id + name + password);
         this.hashid = Security.MD5(String.format("/d", this.id));
         this.role = 0;
-
+        this.data = 0;
     }
 
     public User(int id, String name, String password, String hashpass,
@@ -114,6 +124,7 @@ public class User {
     public int getData() {
         return data;
     }
+
     @Override
     public String toString() {
         return "User{" +
@@ -127,13 +138,10 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         User user = (User) o;
-
         if (id != user.id) return false;
         if (name != null ? !name.equals(user.name) : user.name != null) return false;
         return password != null ? password.equals(user.password) : user.password == null;
-
     }
 
     @Override

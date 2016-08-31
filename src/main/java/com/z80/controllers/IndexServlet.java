@@ -19,7 +19,7 @@ public class IndexServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Auth authService = new Auth();
+        Auth authService = new Auth(req, resp);
         Exception error = null;
         User user = null;
         try {

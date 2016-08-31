@@ -1,5 +1,8 @@
 package com.z80.services;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
 public final class Security {
 
     public static String MD5(String md5) {
@@ -13,8 +16,12 @@ public final class Security {
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
-        } finally {
-            return null;
         }
+    }
+
+    private static SecureRandom random = new SecureRandom();
+
+    public static String randString() {
+        return new BigInteger(130, random).toString(32);
     }
 }

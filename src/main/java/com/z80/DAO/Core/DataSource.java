@@ -1,4 +1,4 @@
-package com.z80.DAO;
+package com.z80.DAO.Core;
 
 import java.util.ResourceBundle;
 

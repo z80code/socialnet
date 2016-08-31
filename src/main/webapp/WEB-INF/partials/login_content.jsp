@@ -12,7 +12,6 @@
                 <%=pageData.getError().getMessage()%>
             </div>
             <%}%>
-            <%=pageData.getUser()%>
         </div>
         <div class="row">
             <div class="col-sm-4 col-sm-offset-1">

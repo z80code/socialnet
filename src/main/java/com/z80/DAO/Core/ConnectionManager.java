@@ -1,7 +1,8 @@
-package com.z80.DAO;
+package com.z80.DAO.Core;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.z80.DAO.Core.DataSource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,8 +33,6 @@ public class ConnectionManager {
                                 dataSource.getPassword());
             }
 
-
         return connection;
     }
-
 }
