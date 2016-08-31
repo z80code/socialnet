@@ -34,10 +34,11 @@ public class UserDataRepository<T, ID> implements CrudRepository, CrudRepository
     private static final String SQL_FIND_BY_HOBBY = SQL_FIND_ALL + " where " + UserData.USERDATA_HOBBY + "=?";
 
     private static final String SQL_INSERT_USERDATA =
-            "insert into " + UserData.TABLE_NAME + "(" +
-                    UserData.USERDATA_FIRSTNAME + ", " + UserData.USERDATA_LASTNAME + ", " +
-                    UserData.USERDATA_EMAIL + ", " + UserData.USERDATA_HOBBY + ") " +
-                    "values (?,?,?,?)";
+            "insert into " + UserData.TABLE_NAME + " (" +
+                    UserData.USERDATA_HASH + ", " + UserData.USERDATA_FIRSTNAME + ", " +
+                    UserData.USERDATA_LASTNAME + ", " + UserData.USERDATA_EMAIL + ", " +
+                    UserData.USERDATA_HOBBY + ", " + UserData.USERDATA_GROUPS +") " +
+                    "values (?,?,?,?,?,?)";
 
     public static final String SQL_UPDATE =
             "update " + UserData.TABLE_NAME +
@@ -105,19 +106,21 @@ public class UserDataRepository<T, ID> implements CrudRepository, CrudRepository
         return (result.next()) ? getFromResult(result) : null;
     }
 
-    private void saveOne(UserData userData) throws SQLException {
-
+    private void saveOne(UserData userData) throws SQLException, ClassNotFoundException {
+        Connection conn = connectionManager.getConnection();
         PreparedStatement statement = conn.prepareStatement(SQL_INSERT_USERDATA);
-        statement.setString(1, userData.getUserdata_firstname());
-        statement.setString(2, userData.getUserdata_lastname());
-        statement.setString(3, userData.getUserdata_email());
-        statement.setString(4, userData.getUserdata_hobby());
+        statement.setString(1, userData.getUserdata_hash());
+        statement.setString(2, userData.getUserdata_firstname());
+        statement.setString(3, userData.getUserdata_lastname());
+        statement.setString(4, userData.getUserdata_email());
+        statement.setString(5, userData.getUserdata_hobby());
+        statement.setString(6, userData.getUserdata_groups());
+
         statement.executeUpdate();
     }
 
     @Override
-    public Object save(Object entity) throws ClassNotFoundException, SQLException {
-        Connection conn = connectionManager.getConnection();
+    public Object save(Object entity) throws SQLException, ClassNotFoundException {
         UserData userData = (UserData) entity;
         saveOne(userData);
         return findByHash(userData.getUserdata_hash());
@@ -169,7 +172,8 @@ public class UserDataRepository<T, ID> implements CrudRepository, CrudRepository
                 result.getString("userdata_firstname"),
                 result.getString("userdata_lastname"),
                 result.getString("userdata_email"),
-                result.getString("userdata_hobby")
+                result.getString("userdata_hobby"),
+                result.getString("userdata_groups")
         );
     }
 }

@@ -40,6 +40,7 @@ public class RegistrationServlet extends HttpServlet {
                 user = authService.getUser(req, resp);
             } catch (Exception e) {
                 throwExcep(e);
+                //resp.sendRedirect("/");
             }
         }
 
@@ -47,10 +48,11 @@ public class RegistrationServlet extends HttpServlet {
             UserService userService = new UserService();
             try {
                 user = new User(0,username, password);
-                UserData userData = new UserData(0,user.getHashid(), null, null, email, null);
+                UserData userData = new UserData(0,user.getHashid(), null, null, email, null, null);
                 user = userService.regUser(user, userData);
             } catch (Exception e) {
                 throwExcep(e);
+                resp.sendRedirect("/");
             }
         }
         Page page = new Page("Вход | Регистрация", user, PageMode.Login);

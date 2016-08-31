@@ -75,6 +75,7 @@ public class LoginServlet extends HttpServlet {
                     error = new Exception("Ошибка соединения с базой.(Error 002)", e);
                 }
                 user = null;
+                resp.sendRedirect("/");
             }
         }
         Page page = new Page("Вход | Регистрация", user, PageMode.Login);

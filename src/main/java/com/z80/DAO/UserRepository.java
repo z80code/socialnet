@@ -102,8 +102,8 @@ public class UserRepository<T, ID> implements CrudRepository, CrudRepositoryAddo
         return (result.next()) ? getFromResult(result) : null;
     }
 
-    private void saveOne(User user) throws SQLException {
-
+    private void saveOne(User user) throws SQLException, ClassNotFoundException {
+        Connection conn = connectionManager.getConnection();
         PreparedStatement statement = conn.prepareStatement(SQL_INSERT_USER);
         statement.setString(1, user.getName());
         statement.setString(2, user.getPassword());
@@ -118,7 +118,6 @@ public class UserRepository<T, ID> implements CrudRepository, CrudRepositoryAddo
 
     @Override
     public Object save(Object entity) throws ClassNotFoundException, SQLException {
-        Connection conn = connectionManager.getConnection();
         User user = (User) entity;
         saveOne(user);
         return findByName(user.getName());
